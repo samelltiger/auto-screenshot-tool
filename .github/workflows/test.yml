@@ -39,10 +39,17 @@ jobs:
       - name: Test build without publishing
         run: npm run pack
 
-      - name: Check dist folder
+      - name: Check dist folder (Unix)
+        if: runner.os != 'Windows'
         run: |
           echo "Contents of dist folder:"
           ls -la dist/ || echo "No dist folder created"
+          
+      - name: Check dist folder (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          echo "Contents of dist folder:"
+          if (Test-Path "dist") { Get-ChildItem -Path "dist" -Force } else { echo "No dist folder created" }
 
   security-scan:
     name: Security Scan

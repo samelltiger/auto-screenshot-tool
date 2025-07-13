@@ -43,6 +43,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Setup Windows build environment
+        if: matrix.os == 'windows-latest'
+        run: |
+          # 确保构建环境正确设置
+          npm config set msvs_version 2019
+        continue-on-error: true
+
       - name: Build application (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
