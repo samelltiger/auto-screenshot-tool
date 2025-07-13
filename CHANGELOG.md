@@ -31,13 +31,13 @@
 
 ### 技术特性
 - Electron 应用框架
-- 跨平台支持（Windows、macOS、Linux）
+- 跨平台支持（Windows、macOS）
 - 本地数据存储（JSON）
 - 图片处理（Sharp）
 - 现代化界面设计
 
 ### 系统要求
-- Windows 10+ / macOS 10.13+ / Linux (x64)
+- Windows 10+ / macOS 10.13+
 - 2GB RAM 推荐
 - 500MB 可用磁盘空间
 
@@ -49,8 +49,7 @@
 1. 从 [GitHub Releases](https://github.com/samelltiger/auto-screenshot-tool/releases) 下载最新版本
 2. 选择适合您操作系统的安装包：
    - Windows: `.exe` 或 `.msi`
-   - macOS: `.dmg`
-   - Linux: `.AppImage`, `.deb`, 或 `.rpm`
+   - macOS: `.zip`
 
 ### 数据迁移
 - 应用更新不会影响现有截图数据
@@ -59,7 +58,6 @@
 
 ### 已知问题
 - macOS 首次运行可能需要在"安全性与隐私"中允许应用运行
-- Linux 某些发行版可能需要手动安装依赖包
 - Windows Defender 可能误报，请添加信任
 
 ### 反馈和支持
