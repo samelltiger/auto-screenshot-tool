@@ -177,8 +177,9 @@ class SimpleDatabaseManager {
       s => s.timestamp >= today.getTime()
     );
 
+    // 计算总文件大小，支持 fileSize 和 file_size 两种字段名
     const totalSize = this.data.screenshots.reduce(
-      (sum, s) => sum + (s.file_size || 0), 0
+      (sum, s) => sum + (s.fileSize || s.file_size || 0), 0
     );
 
     return {

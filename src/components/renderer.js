@@ -6,6 +6,7 @@ class ScreenshotApp {
         this.currentConfig = null;
         this.currentImages = [];
         this.currentImageIndex = 0;
+        this.statisticsTimer = null; // 统计信息更新定时器
         
         this.init();
     }
@@ -33,6 +34,9 @@ class ScreenshotApp {
         
         // 加载今天的图片
         await this.loadGalleryImages(today);
+        
+        // 启动定期更新统计信息的定时器（每30秒更新一次）
+        this.startStatisticsUpdateTimer();
         
         console.log('应用初始化完成');
     }
@@ -373,14 +377,39 @@ class ScreenshotApp {
     async updateStatistics() {
         try {
             const stats = await ipcRenderer.invoke('screenshots:getStatistics');
+            console.log('统计信息更新:', stats); // 添加调试信息
+            
             document.getElementById('today-count').textContent = stats.today;
             document.getElementById('total-count').textContent = stats.total;
             
             // 更新存储信息
             const storageInfo = this.formatFileSize(stats.totalSize || 0);
             document.getElementById('storage-info').textContent = `存储空间: ${storageInfo}`;
+            
+            console.log(`存储空间已更新: ${storageInfo}`); // 添加调试信息
         } catch (error) {
             console.error('更新统计信息失败:', error);
+        }
+    }
+
+    // 启动统计信息定时器
+    startStatisticsUpdateTimer() {
+        // 清除可能存在的旧定时器
+        if (this.statisticsTimer) {
+            clearInterval(this.statisticsTimer);
+        }
+        
+        // 设置新的定时器，每30秒更新一次
+        this.statisticsTimer = setInterval(async () => {
+            await this.updateStatistics();
+        }, 30000);
+    }
+
+    // 停止统计信息定时器
+    stopStatisticsUpdateTimer() {
+        if (this.statisticsTimer) {
+            clearInterval(this.statisticsTimer);
+            this.statisticsTimer = null;
         }
     }
 
@@ -405,11 +434,19 @@ class ScreenshotApp {
         }
 
         container.innerHTML = images.map((image, index) => `
-            <div class="gallery-item" onclick="app.openImageModal(${index})">
-                <img src="file://${image.filepath}" alt="截图">
-                <div class="gallery-item-info">
+            <div class="gallery-item">
+                <img src="file://${image.filepath}" alt="截图" onclick="app.openImageModal(${index})">
+                <div class="gallery-item-info" onclick="app.openImageModal(${index})">
                     <div class="gallery-item-time">${this.formatTime(image.timestamp)}</div>
                     <div class="gallery-item-theme">${image.theme || '无主题'}</div>
+                </div>
+                <div class="gallery-item-actions">
+                    <button class="action-btn download-btn" onclick="event.stopPropagation(); app.downloadImage(${index})" title="下载图片">
+                        📥
+                    </button>
+                    <button class="action-btn copy-btn" onclick="event.stopPropagation(); app.copyImageToClipboard(${index})" title="复制图片">
+                        📋
+                    </button>
                 </div>
             </div>
         `).join('');
@@ -492,6 +529,42 @@ class ScreenshotApp {
         const newDate = currentDate.toISOString().split('T')[0];
         datePicker.value = newDate;
         this.loadGalleryImages(newDate);
+    }
+
+    // 下载图片
+    async downloadImage(index) {
+        const image = this.currentImages[index];
+        if (image) {
+            try {
+                const result = await ipcRenderer.invoke('file:saveAs', image.filepath);
+                if (result.success) {
+                    this.showNotification('下载成功', '图片已保存到指定位置');
+                } else {
+                    this.showNotification('下载取消', '用户取消了下载操作');
+                }
+            } catch (error) {
+                console.error('下载图片失败:', error);
+                this.showNotification('下载失败', '下载过程中发生错误');
+            }
+        }
+    }
+
+    // 复制图片到剪贴板
+    async copyImageToClipboard(index) {
+        const image = this.currentImages[index];
+        if (image) {
+            try {
+                const result = await ipcRenderer.invoke('file:copyToClipboard', image.filepath);
+                if (result.success) {
+                    this.showNotification('复制成功', '图片已复制到剪贴板');
+                } else {
+                    this.showNotification('复制失败', '无法复制图片到剪贴板');
+                }
+            } catch (error) {
+                console.error('复制图片失败:', error);
+                this.showNotification('复制失败', '复制过程中发生错误');
+            }
+        }
     }
 
     // 刷新图片浏览器

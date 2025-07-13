@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Menu, Tray, dialog, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu, Tray, dialog, shell, clipboard, nativeImage } = require('electron');
 const path = require('path');
 const fs = require('fs-extra');
 const ScreenshotManager = require('./utils/screenshot');
@@ -430,6 +430,42 @@ class AutoScreenshotApp {
       } catch (error) {
         console.error('删除文件失败:', error);
         return false;
+      }
+    });
+
+    // 文件另存为
+    ipcMain.handle('file:saveAs', async (event, sourcePath) => {
+      try {
+        const result = await dialog.showSaveDialog(this.mainWindow, {
+          title: '保存图片',
+          defaultPath: path.basename(sourcePath),
+          filters: [
+            { name: '图片文件', extensions: ['png', 'jpg', 'jpeg'] },
+            { name: 'PNG图片', extensions: ['png'] },
+            { name: 'JPEG图片', extensions: ['jpg', 'jpeg'] }
+          ]
+        });
+        
+        if (!result.canceled) {
+          await fs.copy(sourcePath, result.filePath);
+          return { success: true, filePath: result.filePath };
+        }
+        return { success: false, reason: 'cancelled' };
+      } catch (error) {
+        console.error('保存文件失败:', error);
+        return { success: false, reason: error.message };
+      }
+    });
+
+    // 复制图片到剪贴板
+    ipcMain.handle('file:copyToClipboard', async (event, imagePath) => {
+      try {
+        const image = nativeImage.createFromPath(imagePath);
+        clipboard.writeImage(image);
+        return { success: true };
+      } catch (error) {
+        console.error('复制图片到剪贴板失败:', error);
+        return { success: false, reason: error.message };
       }
     });
 
