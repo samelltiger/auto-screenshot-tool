@@ -46,7 +46,7 @@
   },
   "build": {
     "appId": "com.developer.auto-screenshot-tool",
-    "productName": "自动截图工具",
+    "productName": "AutoScreenshotTool",
     "directories": {
       "output": "dist",
       "buildResources": "build"
@@ -163,7 +163,7 @@
       "installerHeaderIcon": "build/icon.ico",
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "自动截图工具"
+      "shortcutName": "AutoScreenshotTool"
     },
     "publish": {
       "provider": "github",
