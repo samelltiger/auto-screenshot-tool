@@ -54,22 +54,34 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           npm run build:linux
+          echo "=== Linux Build Output ==="
+          ls -lah dist/ || echo "No dist directory found"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ELECTRON_CACHE: .cache/electron
+          ELECTRON_BUILDER_CACHE: .cache/electron-builder
 
       - name: Build application (Windows)
         if: matrix.os == 'windows-latest'
         run: |
           npm run build:win
+          echo "=== Windows Build Output ==="
+          if (Test-Path "dist") { Get-ChildItem -Path "dist" -Recurse } else { echo "No dist directory found" }
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ELECTRON_CACHE: .cache/electron
+          ELECTRON_BUILDER_CACHE: .cache/electron-builder
 
       - name: Build application (macOS)
         if: matrix.os == 'macos-latest'
         run: |
           npm run build:mac
+          echo "=== macOS Build Output ==="
+          ls -lah dist/ || echo "No dist directory found"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ELECTRON_CACHE: .cache/electron
+          ELECTRON_BUILDER_CACHE: .cache/electron-builder
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
       - name: Upload artifacts (Linux)
@@ -77,30 +89,27 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: linux-build
-          path: |
-            dist/*.AppImage
-            dist/*.deb
-            dist/*.rpm
-            dist/*.tar.gz
+          path: dist/
+          retention-days: 5
+          if-no-files-found: warn
 
       - name: Upload artifacts (Windows)
         if: matrix.os == 'windows-latest'
         uses: actions/upload-artifact@v4
         with:
           name: windows-build
-          path: |
-            dist/*.exe
-            dist/*.msi
-            dist/*.zip
+          path: dist/
+          retention-days: 5
+          if-no-files-found: warn
 
       - name: Upload artifacts (macOS)
         if: matrix.os == 'macos-latest'
         uses: actions/upload-artifact@v4
         with:
           name: macos-build
-          path: |
-            dist/*.dmg
-            dist/*.zip
+          path: dist/
+          retention-days: 5
+          if-no-files-found: warn
 
   release:
     needs: build
@@ -117,13 +126,26 @@ jobs:
           path: artifacts
 
       - name: Display structure of downloaded files
-        run: ls -la artifacts/
+        run: |
+          echo "=== Artifacts directory structure ==="
+          find artifacts -type f -name "*" | sort
+          echo ""
+          echo "=== File sizes ==="
+          find artifacts -type f -name "*" -exec ls -lh {} \;
 
       - name: Prepare release assets
         run: |
           mkdir -p release-assets
+          echo "=== Preparing release assets ==="
+          
+          # 复制所有构建文件到 release-assets 目录
           find artifacts -type f \( -name "*.exe" -o -name "*.msi" -o -name "*.dmg" -o -name "*.AppImage" -o -name "*.deb" -o -name "*.rpm" -o -name "*.tar.gz" -o -name "*.zip" \) -exec cp {} release-assets/ \;
-          ls -la release-assets/
+          
+          echo "=== Release assets ==="
+          ls -lah release-assets/
+          
+          echo "=== Total files to upload ==="
+          find release-assets -type f | wc -l
 
       - name: Get version from tag or input
         id: get_version
@@ -176,27 +198,25 @@ jobs:
           🤖 此版本由 GitHub Actions 自动构建
           EOF
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Release and Upload Assets
+        if: hashFiles('release-assets/*') != ''
+        uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.get_version.outputs.tag_name }}
-          release_name: 自动截图工具 ${{ steps.get_version.outputs.version }}
+          name: 自动截图工具 ${{ steps.get_version.outputs.version }}
           body_path: release_notes.md
           draft: false
           prerelease: false
-
-      - name: Upload Release Assets
+          files: release-assets/*
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Check if release was created
         run: |
-          for file in release-assets/*; do
-            if [[ -f "$file" ]]; then
-              echo "Uploading: $(basename "$file")"
-              curl -X POST \
-                -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-                -H "Content-Type: application/octet-stream" \
-                --data-binary @"$file" \
-                "${{ steps.create_release.outputs.upload_url }}?name=$(basename "$file")"
-            fi
-          done
+          if [ "$(find release-assets -type f | wc -l)" -eq 0 ]; then
+            echo "❌ No release assets found!"
+            exit 1
+          else
+            echo "✅ Release created with $(find release-assets -type f | wc -l) assets"
+          fi
