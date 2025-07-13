@@ -1,0 +1,51 @@
+{
+  "name": "auto-screenshot-tool",
+  "version": "1.0.0",
+  "description": "自动截图工具，支持定时截图、OCR文字识别、图片搜索和管理",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "npx electron src/main.js",
+    "dev": "npx electron src/main.js --dev",
+    "build": "npx electron-builder",
+    "build:mac": "npx electron-builder --mac",
+    "build:win": "npx electron-builder --win",
+    "pack": "npx electron-builder --dir"
+  },
+  "keywords": [
+    "screenshot",
+    "ocr",
+    "electron",
+    "desktop"
+  ],
+  "author": "Developer",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.2.2",
+    "fs-extra": "^11.2.0",
+    "moment": "^2.30.1",
+    "path": "^0.12.7",
+    "screenshot-desktop": "^1.15.0",
+    "sharp": "^0.34.3"
+  },
+  "build": {
+    "appId": "com.developer.auto-screenshot-tool",
+    "productName": "自动截图工具",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "node_modules/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity"
+    },
+    "win": {
+      "target": "nsis"
+    }
+  }
+}

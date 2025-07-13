@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自动截图工具</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app">
+        <!-- 顶部导航 -->
+        <nav class="navbar">
+            <div class="nav-brand">
+                <h1>📸 自动截图工具</h1>
+            </div>
+            <div class="nav-menu">
+                <button class="nav-item active" data-tab="control">控制面板</button>
+                <button class="nav-item" data-tab="gallery">图片浏览</button>
+                <button class="nav-item" data-tab="search">搜索</button>
+                <button class="nav-item" data-tab="settings">设置</button>
+            </div>
+        </nav>
+
+        <!-- 主要内容区域 -->
+        <main class="main-content">
+            
+            <!-- 控制面板 -->
+            <div class="tab-content active" id="control-tab">
+                <div class="control-panel">
+                    <!-- 状态显示 -->
+                    <div class="status-card">
+                        <h3>📊 状态信息</h3>
+                        <div class="status-grid">
+                            <div class="status-item">
+                                <span class="status-label">截图状态</span>
+                                <span class="status-value" id="capture-status">已停止</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">当前主题</span>
+                                <span class="status-value" id="current-theme">无</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">今日截图</span>
+                                <span class="status-value" id="today-count">0</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">总计截图</span>
+                                <span class="status-value" id="total-count">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 控制区域 -->
+                    <div class="control-card">
+                        <h3>🎮 截图控制</h3>
+                        
+                        <!-- 间隔设置 -->
+                        <div class="control-group">
+                            <label for="interval-slider">截图间隔: <span id="interval-value">30</span> 秒</label>
+                            <input type="range" id="interval-slider" min="5" max="300" value="30" step="5">
+                        </div>
+
+                        <!-- 主题设置 -->
+                        <div class="control-group">
+                            <label for="theme-input">当前活动主题</label>
+                            <div class="theme-input-group">
+                                <input type="text" id="theme-input" placeholder="输入活动主题（可选）">
+                                <button id="theme-history-btn" title="选择历史主题">📋</button>
+                            </div>
+                            <div class="recent-themes" id="recent-themes" style="display: none;">
+                                <!-- 最近使用的主题会动态加载 -->
+                            </div>
+                        </div>
+
+                        <!-- 控制按钮 -->
+                        <div class="control-buttons">
+                            <button class="btn btn-primary" id="start-btn">▶️ 开始截图</button>
+                            <button class="btn btn-secondary" id="stop-btn" disabled>⏹️ 停止截图</button>
+                            <button class="btn btn-secondary" id="capture-once-btn">📷 立即截图</button>
+                        </div>
+                    </div>
+
+                    <!-- 快速操作 -->
+                    <div class="quick-actions">
+                        <h3>⚡ 快速操作</h3>
+                        <div class="action-buttons">
+                            <button class="btn btn-outline" id="open-folder-btn">📁 打开截图文件夹</button>
+                            <button class="btn btn-outline" id="cleanup-btn">🗑️ 清理过期文件</button>
+                            <button class="btn btn-outline" id="export-btn">📤 导出数据</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 图片浏览 -->
+            <div class="tab-content" id="gallery-tab">
+                <div class="gallery-panel">
+                    <!-- 日期选择器 -->
+                    <div class="date-selector">
+                        <label for="date-picker">选择日期:</label>
+                        <input type="date" id="date-picker">
+                        <button class="btn btn-small" id="today-btn">今天</button>
+                        <button class="btn btn-small" id="prev-day-btn">前一天</button>
+                        <button class="btn btn-small" id="next-day-btn">后一天</button>
+                    </div>
+
+                    <!-- 图片网格 -->
+                    <div class="gallery-grid" id="gallery-grid">
+                        <!-- 图片缩略图会动态加载 -->
+                    </div>
+
+                    <!-- 图片预览模态框 -->
+                    <div class="modal" id="image-modal">
+                        <div class="modal-content">
+                            <span class="close">&times;</span>
+                            <img class="modal-image" id="modal-image">
+                            <div class="image-info">
+                                <h4 id="image-title"></h4>
+                                <p><strong>时间:</strong> <span id="image-time"></span></p>
+                                <p><strong>主题:</strong> <span id="image-theme"></span></p>
+                                <p><strong>OCR文本:</strong></p>
+                                <textarea id="image-ocr" readonly></textarea>
+                                <div class="image-actions">
+                                    <button class="btn btn-small" id="copy-ocr-btn">复制文本</button>
+                                    <button class="btn btn-small" id="open-file-btn">在文件夹中显示</button>
+                                    <button class="btn btn-small btn-danger" id="delete-image-btn">删除</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 搜索页面 -->
+            <div class="tab-content" id="search-tab">
+                <div class="search-panel">
+                    <div class="search-form">
+                        <h3>🔍 搜索截图</h3>
+                        
+                        <div class="search-group">
+                            <label for="search-theme">主题关键词</label>
+                            <input type="text" id="search-theme" placeholder="搜索主题...">
+                        </div>
+
+                        <div class="search-group">
+                            <label for="search-ocr">OCR文本</label>
+                            <input type="text" id="search-ocr" placeholder="搜索图片中的文字...">
+                        </div>
+
+                        <div class="search-group">
+                            <label>日期范围</label>
+                            <div class="date-range">
+                                <input type="date" id="search-date-from">
+                                <span>至</span>
+                                <input type="date" id="search-date-to">
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary" id="search-btn">搜索</button>
+                        <button class="btn btn-secondary" id="clear-search-btn">清空</button>
+                    </div>
+
+                    <!-- 搜索结果 -->
+                    <div class="search-results" id="search-results">
+                        <!-- 搜索结果会动态显示 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 设置页面 -->
+            <div class="tab-content" id="settings-tab">
+                <div class="settings-panel">
+                    <h3>⚙️ 设置</h3>
+                    
+                    <!-- 基本设置 -->
+                    <div class="settings-section">
+                        <h4>基本设置</h4>
+                        
+                        <div class="setting-item">
+                            <label for="default-interval">默认截图间隔 (秒)</label>
+                            <input type="number" id="default-interval" min="5" max="3600" value="30">
+                        </div>
+
+                        <div class="setting-item">
+                            <label for="retention-days">文件保留天数</label>
+                            <input type="number" id="retention-days" min="1" max="365" value="30">
+                        </div>
+
+                        <div class="setting-item">
+                            <label for="auto-cleanup">
+                                <input type="checkbox" id="auto-cleanup" checked>
+                                自动清理过期文件
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- OCR设置 -->
+                    <div class="settings-section">
+                        <h4>OCR设置</h4>
+                        
+                        <div class="setting-item">
+                            <label for="enable-ocr">
+                                <input type="checkbox" id="enable-ocr" checked>
+                                启用OCR文字识别
+                            </label>
+                        </div>
+
+                        <div class="setting-item">
+                            <label for="ocr-confidence">OCR置信度阈值</label>
+                            <input type="range" id="ocr-confidence" min="0" max="1" step="0.1" value="0.7">
+                            <span id="confidence-value">0.7</span>
+                        </div>
+
+                        <div class="setting-item">
+                            <button class="btn btn-outline" id="test-ocr-btn">测试OCR功能</button>
+                            <span id="ocr-status" style="margin-left: 1rem; color: #6c757d;">检查中...</span>
+                        </div>
+                    </div>
+
+                    <!-- 界面设置 -->
+                    <div class="settings-section">
+                        <h4>界面设置</h4>
+                        
+                        <div class="setting-item">
+                            <label for="app-theme">界面主题</label>
+                            <select id="app-theme">
+                                <option value="light">浅色</option>
+                                <option value="dark">深色</option>
+                            </select>
+                        </div>
+
+                        <div class="setting-item">
+                            <label for="show-notifications">
+                                <input type="checkbox" id="show-notifications" checked>
+                                显示通知
+                            </label>
+                        </div>
+
+                        <div class="setting-item">
+                            <label for="auto-start">
+                                <input type="checkbox" id="auto-start">
+                                开机自启动
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 操作按钮 -->
+                    <div class="settings-actions">
+                        <button class="btn btn-primary" id="save-settings-btn">保存设置</button>
+                        <button class="btn btn-secondary" id="reset-settings-btn">重置为默认</button>
+                        <button class="btn btn-outline" id="export-config-btn">导出配置</button>
+                        <button class="btn btn-outline" id="import-config-btn">导入配置</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 底部状态栏 -->
+        <footer class="status-bar">
+            <div class="status-left">
+                <span id="app-status">就绪</span>
+            </div>
+            <div class="status-right">
+                <span id="storage-info">存储空间: 计算中...</span>
+            </div>
+        </footer>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>
