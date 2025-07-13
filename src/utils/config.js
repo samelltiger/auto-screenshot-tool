@@ -12,14 +12,18 @@ class ConfigManager {
       imageFormat: 'png',         // 图片格式：png, jpg
       
       // OCR设置
-      enableOCR: true,           // 是否启用OCR
+      enableOCR: false,           // 是否启用OCR
       ocrLanguage: 'auto',       // OCR语言：auto, zh, en
       ocrConfidence: 0.7,        // OCR置信度阈值
       
+      // 相似度检测设置
+      enableSimilarityCheck: true,   // 是否启用相似度检测
+      similarityThreshold: 97,       // 相似度阈值 (80-99)
+      
       // 文件管理
-      retentionDays: 30,         // 文件保留天数
+      retentionDays: 15,         // 文件保留天数
       autoCleanup: true,         // 自动清理过期文件
-      maxStorageSize: 1024,      // 最大存储大小（MB）
+      maxStorageSize: 10240,      // 最大存储大小（MB）
       
       // 界面设置
       theme: 'light',            // 界面主题：light, dark
@@ -161,6 +165,11 @@ class ConfigManager {
     // 验证OCR置信度
     if (this.config.ocrConfidence < 0 || this.config.ocrConfidence > 1) {
       this.config.ocrConfidence = this.defaultConfig.ocrConfidence;
+    }
+
+    // 验证相似度阈值
+    if (this.config.similarityThreshold < 80 || this.config.similarityThreshold > 99) {
+      this.config.similarityThreshold = this.defaultConfig.similarityThreshold;
     }
 
     // 验证最大存储大小

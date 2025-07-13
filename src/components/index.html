@@ -141,26 +141,6 @@
                     <div class="gallery-grid" id="gallery-grid">
                         <!-- 图片缩略图会动态加载 -->
                     </div>
-
-                    <!-- 图片预览模态框 -->
-                    <div class="modal" id="image-modal">
-                        <div class="modal-content">
-                            <span class="close">&times;</span>
-                            <img class="modal-image" id="modal-image">
-                            <div class="image-info">
-                                <h4 id="image-title"></h4>
-                                <p><strong>时间:</strong> <span id="image-time"></span></p>
-                                <p><strong>主题:</strong> <span id="image-theme"></span></p>
-                                <p><strong>OCR文本:</strong></p>
-                                <textarea id="image-ocr" readonly></textarea>
-                                <div class="image-actions">
-                                    <button class="btn btn-small" id="copy-ocr-btn">复制文本</button>
-                                    <button class="btn btn-small" id="open-file-btn">在文件夹中显示</button>
-                                    <button class="btn btn-small btn-danger" id="delete-image-btn">删除</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -224,6 +204,20 @@
                                 <input type="checkbox" id="auto-cleanup" checked>
                                 自动清理过期文件
                             </label>
+                        </div>
+
+                        <div class="setting-item">
+                            <label for="enable-similarity-check">
+                                <input type="checkbox" id="enable-similarity-check" checked>
+                                启用图片相似度检测
+                            </label>
+                        </div>
+
+                        <div class="setting-item">
+                            <label for="similarity-threshold">相似度阈值 (%)</label>
+                            <input type="range" id="similarity-threshold" min="80" max="99" step="1" value="98">
+                            <span id="similarity-value">98</span>
+                            <div class="setting-hint">相似度低于此值时才保存截图（避免重复图片）</div>
                         </div>
                     </div>
 
@@ -297,6 +291,26 @@
                 <span id="storage-info">存储空间: 计算中...</span>
             </div>
         </footer>
+    </div>
+
+    <!-- 图片预览模态框（全局） -->
+    <div class="modal" id="image-modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <img class="modal-image" id="modal-image">
+            <div class="image-info">
+                <h4 id="image-title"></h4>
+                <p><strong>时间:</strong> <span id="image-time"></span></p>
+                <p><strong>主题:</strong> <span id="image-theme"></span></p>
+                <p><strong>OCR文本:</strong></p>
+                <textarea id="image-ocr" readonly></textarea>
+                <div class="image-actions">
+                    <button class="btn btn-small" id="copy-ocr-btn">复制文本</button>
+                    <button class="btn btn-small" id="open-file-btn">在文件夹中显示</button>
+                    <button class="btn btn-small btn-danger" id="delete-image-btn">删除</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="renderer.js"></script>

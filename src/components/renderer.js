@@ -64,8 +64,8 @@ class ScreenshotApp {
     bindEvents() {
         // 导航标签切换
         document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                this.switchTab(e.target.dataset.tab);
+            item.addEventListener('click', async (e) => {
+                await this.switchTab(e.target.dataset.tab);
             });
         });
 
@@ -180,10 +180,15 @@ class ScreenshotApp {
         document.getElementById('ocr-confidence').addEventListener('input', (e) => {
             document.getElementById('confidence-value').textContent = e.target.value;
         });
+
+        // 相似度阈值滑块
+        document.getElementById('similarity-threshold').addEventListener('input', (e) => {
+            document.getElementById('similarity-value').textContent = e.target.value;
+        });
     }
 
     // 标签切换
-    switchTab(tabName) {
+    async switchTab(tabName) {
         // 更新导航按钮状态
         document.querySelectorAll('.nav-item').forEach(item => {
             item.classList.remove('active');
@@ -205,7 +210,7 @@ class ScreenshotApp {
                 this.initSearch();
                 break;
             case 'settings':
-                this.loadSettings();
+                await this.loadSettings();
                 break;
         }
     }
@@ -376,11 +381,18 @@ class ScreenshotApp {
     // 更新统计信息
     async updateStatistics() {
         try {
-            const stats = await ipcRenderer.invoke('screenshots:getStatistics');
+            // 添加超时机制，避免卡住
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('获取统计信息超时')), 5000)
+            );
+            
+            const statsPromise = ipcRenderer.invoke('screenshots:getStatistics');
+            const stats = await Promise.race([statsPromise, timeoutPromise]);
+            
             console.log('统计信息更新:', stats); // 添加调试信息
             
-            document.getElementById('today-count').textContent = stats.today;
-            document.getElementById('total-count').textContent = stats.total;
+            document.getElementById('today-count').textContent = stats.today || 0;
+            document.getElementById('total-count').textContent = stats.total || 0;
             
             // 更新存储信息
             const storageInfo = this.formatFileSize(stats.totalSize || 0);
@@ -389,6 +401,10 @@ class ScreenshotApp {
             console.log(`存储空间已更新: ${storageInfo}`); // 添加调试信息
         } catch (error) {
             console.error('更新统计信息失败:', error);
+            // 失败时设置默认值，避免界面显示"计算中..."
+            document.getElementById('today-count').textContent = '0';
+            document.getElementById('total-count').textContent = '0';
+            document.getElementById('storage-info').textContent = '存储空间: 0 B';
         }
     }
 
@@ -605,11 +621,19 @@ class ScreenshotApp {
             <h4>搜索结果 (${results.length})</h4>
             <div class="gallery-grid">
                 ${results.map((image, index) => `
-                    <div class="gallery-item" onclick="app.openSearchImageModal(${index})">
-                        <img src="file://${image.filepath}" alt="截图">
-                        <div class="gallery-item-info">
+                    <div class="gallery-item">
+                        <img src="file://${image.filepath}" alt="截图" onclick="app.openSearchImageModal(${index})">
+                        <div class="gallery-item-info" onclick="app.openSearchImageModal(${index})">
                             <div class="gallery-item-time">${this.formatDateTime(image.timestamp)}</div>
                             <div class="gallery-item-theme">${image.theme || '无主题'}</div>
+                        </div>
+                        <div class="gallery-item-actions">
+                            <button class="action-btn download-btn" onclick="event.stopPropagation(); app.downloadSearchImage(${index})" title="下载图片">
+                                📥
+                            </button>
+                            <button class="action-btn copy-btn" onclick="event.stopPropagation(); app.copySearchImageToClipboard(${index})" title="复制图片">
+                                📋
+                            </button>
                         </div>
                     </div>
                 `).join('')}
@@ -624,6 +648,42 @@ class ScreenshotApp {
         this.currentImageIndex = index;
         this.currentImages = this.searchResults;
         this.openImageModal(index);
+    }
+
+    // 下载搜索结果中的图片
+    async downloadSearchImage(index) {
+        const image = this.searchResults[index];
+        if (image) {
+            try {
+                const result = await ipcRenderer.invoke('file:saveAs', image.filepath);
+                if (result.success) {
+                    this.showNotification('下载成功', '图片已保存到指定位置');
+                } else {
+                    this.showNotification('下载取消', '用户取消了下载操作');
+                }
+            } catch (error) {
+                console.error('下载图片失败:', error);
+                this.showNotification('下载失败', '下载过程中发生错误');
+            }
+        }
+    }
+
+    // 复制搜索结果中的图片到剪贴板
+    async copySearchImageToClipboard(index) {
+        const image = this.searchResults[index];
+        if (image) {
+            try {
+                const result = await ipcRenderer.invoke('file:copyToClipboard', image.filepath);
+                if (result.success) {
+                    this.showNotification('复制成功', '图片已复制到剪贴板');
+                } else {
+                    this.showNotification('复制失败', '无法复制图片到剪贴板');
+                }
+            } catch (error) {
+                console.error('复制图片失败:', error);
+                this.showNotification('复制失败', '复制过程中发生错误');
+            }
+        }
     }
 
     // 清空搜索
@@ -646,7 +706,7 @@ class ScreenshotApp {
     }
 
     // 加载设置
-    loadSettings() {
+    async loadSettings() {
         if (!this.currentConfig) return;
 
         document.getElementById('default-interval').value = this.currentConfig.captureInterval;
@@ -655,9 +715,44 @@ class ScreenshotApp {
         document.getElementById('enable-ocr').checked = this.currentConfig.enableOCR;
         document.getElementById('ocr-confidence').value = this.currentConfig.ocrConfidence;
         document.getElementById('confidence-value').textContent = this.currentConfig.ocrConfidence;
+        document.getElementById('enable-similarity-check').checked = this.currentConfig.enableSimilarityCheck !== false;
+        document.getElementById('similarity-threshold').value = this.currentConfig.similarityThreshold || 98;
+        document.getElementById('similarity-value').textContent = this.currentConfig.similarityThreshold || 98;
         document.getElementById('app-theme').value = this.currentConfig.theme;
         document.getElementById('show-notifications').checked = this.currentConfig.showNotifications;
         document.getElementById('auto-start').checked = this.currentConfig.autoStart;
+        
+        // 同步开机自启状态
+        await this.syncAutoStartStatus();
+    }
+
+    // 同步开机自启状态
+    async syncAutoStartStatus() {
+        try {
+            // 添加超时机制，避免卡住
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('同步开机自启状态超时')), 3000)
+            );
+            
+            const syncPromise = async () => {
+                const systemStatus = await ipcRenderer.invoke('autostart:get');
+                const configAutoStart = this.currentConfig.autoStart;
+                
+                // 如果系统状态与配置不一致，同步到系统
+                if (systemStatus.enabled !== configAutoStart) {
+                    console.log(`开机自启状态不一致，同步到系统: ${configAutoStart}`);
+                    await ipcRenderer.invoke('autostart:set', configAutoStart);
+                }
+                
+                // 更新界面显示为实际的系统状态
+                document.getElementById('auto-start').checked = systemStatus.enabled;
+            };
+            
+            await Promise.race([syncPromise(), timeoutPromise]);
+        } catch (error) {
+            console.error('同步开机自启状态失败:', error);
+            // 失败时不阻塞，只是记录错误
+        }
     }
 
     // 加载微信二维码
@@ -681,14 +776,25 @@ class ScreenshotApp {
             autoCleanup: document.getElementById('auto-cleanup').checked,
             enableOCR: document.getElementById('enable-ocr').checked,
             ocrConfidence: parseFloat(document.getElementById('ocr-confidence').value),
+            enableSimilarityCheck: document.getElementById('enable-similarity-check').checked,
+            similarityThreshold: parseInt(document.getElementById('similarity-threshold').value),
             theme: document.getElementById('app-theme').value,
             showNotifications: document.getElementById('show-notifications').checked,
             autoStart: document.getElementById('auto-start').checked
         };
 
         try {
+            // 保存配置到文件
             const success = await ipcRenderer.invoke('config:update', config);
             if (success) {
+                // 如果开机自启设置发生变化，更新系统设置
+                if (this.currentConfig && this.currentConfig.autoStart !== config.autoStart) {
+                    const autoStartSuccess = await ipcRenderer.invoke('autostart:set', config.autoStart);
+                    if (!autoStartSuccess) {
+                        this.showNotification('警告', '开机自启设置失败，但其他设置已保存');
+                    }
+                }
+                
                 this.currentConfig = { ...this.currentConfig, ...config };
                 this.applyConfig();
                 this.showNotification('保存成功', '设置已保存');
@@ -710,7 +816,7 @@ class ScreenshotApp {
         try {
             await ipcRenderer.invoke('config:reset');
             await this.loadConfig();
-            this.loadSettings();
+            await this.loadSettings();
             this.showNotification('重置成功', '设置已重置为默认值');
         } catch (error) {
             console.error('重置设置失败:', error);
@@ -737,7 +843,7 @@ class ScreenshotApp {
             const result = await ipcRenderer.invoke('config:import');
             if (result) {
                 await this.loadConfig();
-                this.loadSettings();
+                await this.loadSettings();
                 this.showNotification('导入成功', '配置已导入');
             }
         } catch (error) {

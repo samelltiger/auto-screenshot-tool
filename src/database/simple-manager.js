@@ -80,12 +80,18 @@ class SimpleDatabaseManager {
     }
 
     if (query.dateFrom) {
-      const fromTime = new Date(query.dateFrom).getTime();
+      // 将开始日期设置为当天的00:00:00，确保包含当天的所有数据
+      const fromDate = new Date(query.dateFrom);
+      fromDate.setHours(0, 0, 0, 0);
+      const fromTime = fromDate.getTime();
       results = results.filter(s => s.timestamp >= fromTime);
     }
 
     if (query.dateTo) {
-      const toTime = new Date(query.dateTo).getTime();
+      // 将结束日期设置为当天的23:59:59.999，确保包含当天的所有数据
+      const toDate = new Date(query.dateTo);
+      toDate.setHours(23, 59, 59, 999);
+      const toTime = toDate.getTime();
       results = results.filter(s => s.timestamp <= toTime);
     }
 

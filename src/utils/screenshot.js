@@ -4,6 +4,7 @@ const path = require('path');
 const moment = require('moment');
 const { app } = require('electron');
 const sharp = require('sharp');
+const ImageSimilarityDetector = require('./image-similarity');
 
 class ScreenshotManager {
   constructor(databaseManager, configManager, mainApp = null) {
@@ -15,6 +16,7 @@ class ScreenshotManager {
     this.currentTheme = '';
     this.screenshotsDir = path.join(app.getPath('userData'), 'screenshots');
     this.screenshotCount = 0; // 添加截图计数器
+    this.similarityDetector = new ImageSimilarityDetector(); // 相似度检测器
   }
 
   async initialize() {
@@ -31,6 +33,9 @@ class ScreenshotManager {
 
     this.currentTheme = theme;
     this.isCapturing = true;
+
+    // 重置相似度检测器（开始新的截图会话）
+    this.similarityDetector.reset();
 
     // 立即截取一张
     await this.takeScreenshot();
@@ -94,16 +99,12 @@ class ScreenshotManager {
       const dayDir = path.join(this.screenshotsDir, dateFolder);
       await fs.ensureDir(dayDir);
 
-      // 生成文件名
-      const filename = this.currentTheme 
-        ? `${timestamp}_${this.sanitizeFilename(this.currentTheme)}.jpg`
-        : `${timestamp}.jpg`;
-      
-      const filepath = path.join(dayDir, filename);
+      // 生成临时文件名用于相似度检测
+      const tempFilename = `temp_${timestamp}.jpg`;
+      const tempFilepath = path.join(dayDir, tempFilename);
 
       // 截图
       const imgBuffer = await screenshot({ format: 'png' });
-      // await fs.writeFile(filepath, imgBuffer);
 
       // 使用 sharp 优化并转换为 jpg
       const optimizedBuffer = await sharp(imgBuffer)
@@ -114,7 +115,40 @@ class ScreenshotManager {
         })
         .toBuffer();
 
-      await fs.writeFile(filepath, optimizedBuffer);
+      // 先保存临时文件用于相似度检测
+      await fs.writeFile(tempFilepath, optimizedBuffer);
+
+      // 获取配置中的相似度检测设置
+      const config = await this.configManager.getConfig();
+      const similarityEnabled = config.enableSimilarityCheck !== false; // 默认启用
+      const similarityThreshold = config.similarityThreshold || 98; // 默认98%
+
+      // 相似度检测
+      let shouldSave = true;
+      if (similarityEnabled) {
+        shouldSave = await this.similarityDetector.shouldSaveImage(tempFilepath, similarityThreshold);
+      }
+
+      if (!shouldSave) {
+        // 删除临时文件
+        await fs.remove(tempFilepath);
+        console.log('图片相似度过高，跳过保存');
+        return {
+          success: false,
+          reason: 'similarity_too_high',
+          message: '图片相似度过高，跳过保存'
+        };
+      }
+
+      // 生成最终文件名
+      const filename = this.currentTheme 
+        ? `${timestamp}_${this.sanitizeFilename(this.currentTheme)}.jpg`
+        : `${timestamp}.jpg`;
+      
+      const filepath = path.join(dayDir, filename);
+
+      // 重命名临时文件为最终文件名
+      await fs.move(tempFilepath, filepath);
 
       // 获取文件大小
       const stats = await fs.stat(filepath);
@@ -132,10 +166,6 @@ class ScreenshotManager {
       
       console.log(`截图保存成功: ${filename}`);
       
-      // 异步进行OCR处理
-      // this.processOCR(screenshotId, filepath).catch(error => {
-      //   console.error('OCR处理失败:', error);
-      // });
       // 增加截图计数
       this.screenshotCount++;
 

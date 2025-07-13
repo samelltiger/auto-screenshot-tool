@@ -502,6 +502,36 @@ class AutoScreenshotApp {
         }
         return null;
     });
+
+    // 开机自启设置
+    ipcMain.handle('autostart:set', async (event, enabled) => {
+      try {
+        app.setLoginItemSettings({
+          openAtLogin: enabled,
+          openAsHidden: enabled, // 开机时隐藏启动
+          name: 'AutoScreenshotTool'
+        });
+        console.log(`开机自启${enabled ? '已启用' : '已禁用'}`);
+        return true;
+      } catch (error) {
+        console.error('设置开机自启失败:', error);
+        return false;
+      }
+    });
+
+    // 获取开机自启状态
+    ipcMain.handle('autostart:get', async () => {
+      try {
+        const settings = app.getLoginItemSettings();
+        return {
+          enabled: settings.openAtLogin,
+          hidden: settings.openAsHidden
+        };
+      } catch (error) {
+        console.error('获取开机自启状态失败:', error);
+        return { enabled: false, hidden: false };
+      }
+    });
   }
 }
 

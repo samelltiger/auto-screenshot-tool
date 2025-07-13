@@ -590,6 +590,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
 }
 
 .setting-item label {
@@ -611,6 +612,14 @@ body {
 
 .setting-item input[type="checkbox"] {
     margin: 0;
+}
+
+.setting-hint {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+    font-style: italic;
+    width: 100%;
 }
 
 .settings-actions {
