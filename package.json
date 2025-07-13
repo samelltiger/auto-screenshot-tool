@@ -172,21 +172,6 @@
       "createStartMenuShortcut": true,
       "shortcutName": "自动截图工具"
     },
-    "dmg": {
-      "contents": [
-        {
-          "x": 130,
-          "y": 220
-        },
-        {
-          "x": 410,
-          "y": 220,
-          "type": "link",
-          "path": "/Applications"
-        }
-      ],
-      "title": "自动截图工具安装器"
-    },
     "publish": {
       "provider": "github",
       "releaseType": "release"
