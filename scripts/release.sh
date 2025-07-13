@@ -51,4 +51,4 @@ git push origin "v$VERSION"
 
 echo "✅ 版本 $VERSION 发布完成！"
 echo "GitHub Actions 将自动构建并发布到 GitHub Releases"
-echo "查看构建状态: https://github.com/username/auto-screenshot-tool/actions"
+echo "查看构建状态: https://github.com/samelltiger/auto-screenshot-tool/actions"

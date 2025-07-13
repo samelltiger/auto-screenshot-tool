@@ -46,7 +46,7 @@
 ## 发布说明
 
 ### 如何获取更新
-1. 从 [GitHub Releases](https://github.com/username/auto-screenshot-tool/releases) 下载最新版本
+1. 从 [GitHub Releases](https://github.com/samelltiger/auto-screenshot-tool/releases) 下载最新版本
 2. 选择适合您操作系统的安装包：
    - Windows: `.exe` 或 `.msi`
    - macOS: `.dmg`
@@ -63,6 +63,6 @@
 - Windows Defender 可能误报，请添加信任
 
 ### 反馈和支持
-- 问题报告: [GitHub Issues](https://github.com/username/auto-screenshot-tool/issues)
-- 功能请求: [GitHub Discussions](https://github.com/username/auto-screenshot-tool/discussions)
+- 问题报告: [GitHub Issues](https://github.com/samelltiger/auto-screenshot-tool/issues)
+- 功能请求: [GitHub Discussions](https://github.com/samelltiger/auto-screenshot-tool/discussions)
 - 使用指南: [README.md](README.md)

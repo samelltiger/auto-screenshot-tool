@@ -27,10 +27,10 @@
     "email": "developer@example.com"
   },
   "license": "MIT",
-  "homepage": "https://github.com/username/auto-screenshot-tool",
+  "homepage": "https://github.com/samelltiger/auto-screenshot-tool",
   "repository": {
     "type": "git",
-    "url": "https://github.com/username/auto-screenshot-tool.git"
+    "url": "https://github.com/samelltiger/auto-screenshot-tool.git"
   },
   "devDependencies": {
     "electron": "^28.0.0",
