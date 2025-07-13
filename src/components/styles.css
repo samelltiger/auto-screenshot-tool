@@ -687,3 +687,173 @@ body.dark-theme .image-info textarea {
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
 }
+
+/* 作者信息区域 */
+.author-info {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-left: auto;
+}
+
+/* GitHub链接 */
+.github-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.github-link:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.github-icon {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+
+/* 微信容器 */
+.wechat-container {
+    position: relative;
+}
+
+.wechat-trigger {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.wechat-trigger:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.wechat-icon {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+
+/* 微信弹窗 */
+.wechat-popup {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 0.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.wechat-container:hover .wechat-popup {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* 二维码容器 */
+.qr-container {
+    position: relative;
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+}
+
+.qr-container img {
+    width: 120px;
+    height: 120px;
+    display: block;
+    border-radius: 8px;
+}
+
+/* 二维码悬停效果 */
+.qr-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 8px;
+}
+
+.qr-container:hover .qr-overlay {
+    opacity: 1;
+}
+
+.qr-overlay span {
+    color: white;
+    font-size: 0.8rem;
+    text-align: center;
+    padding: 0.5rem;
+}
+
+/* 深色主题适配 */
+body.dark-theme .qr-container {
+    background: #2d2d2d;
+    border: 1px solid #444;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .nav-brand {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .author-info {
+        margin-left: 0;
+        margin-top: 1rem;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .wechat-popup {
+        right: 50%;
+        transform: translateX(50%) translateY(-10px);
+    }
+
+    .wechat-container:hover .wechat-popup {
+        transform: translateX(50%) translateY(0);
+    }
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.brand-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}

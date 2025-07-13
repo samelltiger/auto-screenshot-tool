@@ -457,6 +457,15 @@ class AutoScreenshotApp {
         return false;
       }
     });
+
+    // 获取二维码路径
+    ipcMain.handle('get-qr-path', async () => {
+        const qrPath = path.join(__dirname, 'assets/icons/qrcode_for_me.jpg');
+        if (fs.existsSync(qrPath)) {
+            return qrPath;
+        }
+        return null;
+    });
   }
 }
 

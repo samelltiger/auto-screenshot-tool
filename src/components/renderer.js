@@ -23,6 +23,9 @@ class ScreenshotApp {
         await this.updateCaptureStatus(); // 初始化时更新截图状态
         await this.loadRecentThemes();
         await this.checkOCRStatus(); // 检查OCR状态
+
+        // 加载微信二维码
+        await this.loadWechatQRCode();
         
         // 设置当前日期
         const today = new Date().toISOString().split('T')[0];
@@ -582,6 +585,19 @@ class ScreenshotApp {
         document.getElementById('app-theme').value = this.currentConfig.theme;
         document.getElementById('show-notifications').checked = this.currentConfig.showNotifications;
         document.getElementById('auto-start').checked = this.currentConfig.autoStart;
+    }
+
+    // 加载微信二维码
+    async loadWechatQRCode() {
+        try {
+            // 从主进程获取二维码路径
+            const qrPath = await ipcRenderer.invoke('get-qr-path');
+            if (qrPath) {
+                document.getElementById('wechat-qr').src = `file://${qrPath}`;
+            }
+        } catch (error) {
+            console.error('加载微信二维码失败:', error);
+        }
     }
 
     // 保存设置
