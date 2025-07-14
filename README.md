@@ -2,9 +2,9 @@
 
 一个专为自媒体开发者设计的智能截图管理工具，解决内容创作过程中的截图记录问题。
 
-![控制面板](https://github.com/samelltiger/auto-screenshot-tool/raw/maindocs/imgs/controller.png)
-![图片浏览](https://github.com/samelltiger/auto-screenshot-tool/raw/maindocs/imgs/imgages.png)
-![搜索](https://github.com/samelltiger/auto-screenshot-tool/raw/maindocs/imgs/search.png)
+![控制面板](https://github.com/samelltiger/auto-screenshot-tool/raw/main/docs/imgs_1280p_jpg/controller.jpg)
+![图片浏览](https://github.com/samelltiger/auto-screenshot-tool/raw/main/docs/imgs_1280p_jpg/imgages.png)
+![搜索](https://github.com/samelltiger/auto-screenshot-tool/raw/main/docs/imgs_1280p_jpg/search.png)
 
 ## 🎯 项目背景
 

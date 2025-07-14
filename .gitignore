@@ -19,3 +19,4 @@ bin-release/
 node_modules/
 .vscode/
 dist/
+resize_and_convert.py
