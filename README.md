@@ -2,6 +2,10 @@
 
 一个专为自媒体开发者设计的智能截图管理工具，解决内容创作过程中的截图记录问题。
 
+![控制面板](https://github.com/samelltiger/auto-screenshot-tool/raw/maindocs/imgs/controller.png)
+![图片浏览](https://github.com/samelltiger/auto-screenshot-tool/raw/maindocs/imgs/imgages.png)
+![搜索](https://github.com/samelltiger/auto-screenshot-tool/raw/maindocs/imgs/search.png)
+
 ## 🎯 项目背景
 
 作为一名程序开发方向的自媒体创作者，在编写技术文章和记录编程过程时，经常遇到以下痛点：
@@ -371,6 +375,10 @@ npm run lint
 - **项目主页**：https://github.com/samelltiger/auto-screenshot-tool
 - **问题反馈**：https://github.com/samelltiger/auto-screenshot-tool/issues
 - **功能建议**：https://github.com/samelltiger/auto-screenshot-tool/discussions
+
+｜个人微信｜公众号｜
+｜<img src="https://github.com/samelltiger/auto-screenshot-tool/raw/main/src/assets/icons/qrcode_for_me.jpg" width="200" height="200">｜<img src="https://github.com/samelltiger/auto-screenshot-tool/raw/main/src/assets/icons/qrcode_for_gxh.jpg" width="200" height="200">｜
+
 
 ## 📄 许可证
 
