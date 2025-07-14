@@ -310,6 +310,45 @@
             font-size: 1.1rem;
         }
 
+        /* WeChat QR */
+        .wechat-qr {
+            padding: 80px 0;
+            background: #f7fafc;
+            text-align: center;
+        }
+        .wechat-qr h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #2d3748;
+        }
+        .wechat-qr > p {
+            font-size: 1.2rem;
+            color: #718096;
+            margin-bottom: 40px;
+        }
+        .qr-flex {
+            display: flex;
+            justify-content: center;
+            gap: 80px;
+            flex-wrap: wrap;
+        }
+        .qr-item {
+            width: 160px;
+        }
+        .qr-item img {
+            width: 100%;
+            height: 160px;
+            border-radius: 12px;
+            background: #fff;
+            padding: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,.1);
+        }
+        .qr-item p {
+            margin-top: 12px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
         /* Footer */
         .footer {
             background: #2d3748;
@@ -364,6 +403,10 @@
             .platform-grid {
                 grid-template-columns: 1fr;
             }
+
+            .qr-flex {
+                gap: 40px;
+            }
         }
 
         /* Animations */
@@ -395,7 +438,10 @@
     <section class="hero">
         <div class="hero-content">
             <h1>📸 自动截图工具</h1>
-            <p class="hero-subtitle">智能定时截图 • OCR文字识别 • 高效分类管理<br>让每一帧都不错过，让每一刻都有意义</p>
+            <p class="hero-subtitle">
+                自媒体写稿没截图？Bug 回溯缺记录？远程会议手慢拍不到重点？<br>
+                一键设置主题，自动定时截图 + OCR 全文搜索，帮你锁定每个关键帧。
+            </p>
             
             <div class="cta-buttons">
                 <a href="#download" class="btn btn-primary">
@@ -415,44 +461,44 @@
         <div class="container">
             <div class="section-title">
                 <h2>🚀 强大功能</h2>
-                <p>为现代工作者量身定制的截图解决方案</p>
+                <p>用 AI 帮你截图、帮你整理、帮你找图</p>
             </div>
             
             <div class="features-grid">
                 <div class="feature-card">
                     <span class="feature-icon">⏰</span>
                     <h3>智能定时截图</h3>
-                    <p>自定义时间间隔（5秒-1小时），自动记录屏幕内容。支持智能相似度检测，避免重复截图，节省存储空间。</p>
+                    <p>5 秒～1 小时随心设，相似画面自动去重，写教程/跑脚本再也不怕遗漏关键帧。</p>
                 </div>
                 
                 <div class="feature-card">
                     <span class="feature-icon">🏷️</span>
-                    <h3>主题分类管理</h3>
-                    <p>为不同工作场景设置专属主题标签，让截图分类井然有序。支持项目、会议、学习等多种场景管理。</p>
+                    <h3>主题标签管理</h3>
+                    <p>“登录功能开发”“周三例会”“Vue 学习”一键切主题，截图自动归档，项目再多也不乱。</p>
                 </div>
                 
                 <div class="feature-card">
                     <span class="feature-icon">🔍</span>
-                    <h3>OCR 文字识别</h3>
-                    <p>内置先进的OCR引擎，自动识别截图中的文字内容。支持中英文混合识别，让搜索更加精准高效。</p>
+                    <h3>OCR 秒级搜索</h3>
+                    <p>截图即提取文字，支持中英文混排。搜“token 失效”直接跳到报错瞬间，回溯效率 ×10。</p>
                 </div>
                 
                 <div class="feature-card">
                     <span class="feature-icon">🗂️</span>
-                    <h3>强大搜索功能</h3>
-                    <p>支持按日期、主题、OCR文本多维度搜索。快速定位历史截图，再也不用担心找不到重要信息。</p>
+                    <h3>多维搜索</h3>
+                    <p>日期 + 主题 + OCR 关键词三重过滤，10000 张图也能 1 秒定位，告别手动翻文件夹。</p>
                 </div>
                 
                 <div class="feature-card">
                     <span class="feature-icon">📱</span>
-                    <h3>系统托盘集成</h3>
-                    <p>轻量化运行在系统托盘，支持全局快捷键操作。不占用桌面空间，随时响应您的截图需求。</p>
+                    <h3>系统托盘静默运行</h3>
+                    <p>最小化到托盘，全局快捷键一键开/关；写代码、开会、刷剧零打扰，专注不被打断。</p>
                 </div>
                 
                 <div class="feature-card">
                     <span class="feature-icon">🔄</span>
-                    <h3>自动化管理</h3>
-                    <p>智能文件清理，自动删除过期截图。支持开机自启，保持存储空间整洁，提供详细的存储统计信息。</p>
+                    <h3>自动化整理</h3>
+                    <p>按日分文件夹、过期自动清理、实时统计存储占用，硬盘永远不爆仓，历史回顾更清爽。</p>
                 </div>
             </div>
         </div>
@@ -515,7 +561,7 @@
         <div class="container">
             <div class="section-title">
                 <h2>📥 立即下载</h2>
-                <p>选择适合您操作系统的版本，开始高效截图之旅</p>
+                <p>免费 · 开源 · 持续更新</p>
             </div>
             
             <div class="platform-grid">
@@ -552,6 +598,22 @@
                 <p style="opacity: 0.8; font-size: 1.1rem;">
                     🎉 版本 1.0.1 • 免费开源 • 持续更新
                 </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- WeChat QR -->
+    <section class="wechat-qr">
+        <h2>💬 联系我们</h2>
+        <p>扫码加微信或关注公众号，获取最新更新与技术支持</p>
+        <div class="qr-flex">
+            <div class="qr-item">
+                <img src="placeholder-wechat.png" alt="作者微信二维码">
+                <p>作者微信<br>技术支持 & 用户群</p>
+            </div>
+            <div class="qr-item">
+                <img src="placeholder-mp.png" alt="微信公众号二维码">
+                <p>微信公众号<br>更新 & 教程推送</p>
             </div>
         </div>
     </section>
